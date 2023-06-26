@@ -47,7 +47,7 @@ function displayTemp(response) {
 }
 
 function search(query) {
-  let apiKey = "0bfe478a8b8a7te3aao74dc34b69a3b6";
+  let apiKey = "99b8f9330a1bfba3a85e523fd3c2e528";
   let apiUrl = `https://api.shecodes.io/weather/v1/current?query=${query}&key=${apiKey}&units=metric`;
   axios.get(apiUrl).then(displayTemp);
 }
