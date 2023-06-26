@@ -1,62 +1,88 @@
-body {
-  font-family: arial, sans-serif;
+function formatDate(timestamp) {
+  let date = new Date(timestamp);
+
+  let hours = date.getHours();
+  if (hours < 10) {
+    hours = `0${hours}`;
+  }
+  let minutes = date.getMinutes();
+  if (minutes < 10) {
+    minutes = `0${minutes}`;
+  }
+  let days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
+  ];
+  let day = days[date.getDay()];
+
+  return `${day} ${hours}:${minutes}`;
 }
 
-h1 {
-  margin-top: 20px;
-  text-align: left;
-  font-size: 35px;
-  line-height: 20px;
-  font-family: Helvetica;
-  margin-bottom: 30px;
-  color: black;
-  font-weight: 100;
-  margin: 0;
+function displayTemp(response) {
+  let temperatureElement = document.querySelector("#temperature");
+  celsiusTemp = response.data.temperature.current;
+  temperatureElement.innerHTML = Math.round(celsiusTemp);
+  let cityElement = document.querySelector("#city");
+  cityElement.innerHTML = response.data.city;
+  let countryElement = document.querySelector("#country");
+  countryElement.innerHTML = response.data.country;
+  let descriptionElement = document.querySelector("#description");
+  descriptionElement.innerHTML = response.data.condition.description;
+  let humidityElement = document.querySelector("#humidity");
+  humidityElement.innerHTML = response.data.temperature.humidity;
+  let windElement = document.querySelector("#wind");
+  windElement.innerHTML = Math.round(response.data.wind.speed);
+  let dateElement = document.querySelector("#date");
+  dateElement.innerHTML = formatDate(response.data.time * 1000);
+  let iconElement = document.querySelector("#icon");
+  iconElement.setAttribute(
+    "src",
+    `http://shecodes-assets.s3.amazonaws.com/api/weather/icons/${response.data.condition.icon}.png`
+  );
 }
 
-ul {
-  text-align: left;
-  font-size: 15px;
-  margin-top: 15px;
-  margin: 10 10px;
-  padding: 0;
-  list-style: none;
-  color: black;
+function search(query) {
+  let apiKey = "0bfe478a8b8a7te3aao74dc34b69a3b6";
+  let apiUrl = `https://api.shecodes.io/weather/v1/current?query=${query}&key=${apiKey}&units=metric`;
+  axios.get(apiUrl).then(displayTemp);
+}
+function handleSubmit(event) {
+  event.preventDefault();
+  let cityInputElement = document.querySelector("#city-input");
+  search(cityInputElement.value);
 }
 
-p {
-  margin-top: 0px;
-  font-size: 15px;
-  position: relative;
-  left: 300px;
+function showFahrenheitTemp(event) {
+  event.preventDefault();
+  convertToCelsius.classList.remove("active");
+  convertToFahrenheit.classList.add("active");
+  let temperatureElement = document.querySelector("#temperature");
+  let fahrenheitTemp = (celsiusTemp * 9) / 5 + 32;
+  temperatureElement.innerHTML = Math.round(fahrenheitTemp);
 }
 
-.weather-app {
-  border: 1px solid #dadde1;
-  padding: 15px;
-  margin: 20px auto;
-  border-radius: 10px;
-  max-width: 600px;
+function showCelsiusTemp(event) {
+  event.preventDefault();
+  convertToCelsius.classList.add("active");
+  convertToFahrenheit.classList.remove("active");
+  let temperatureElement = document.querySelector("#temperature");
+  temperatureElement.innerHTML = Math.round(celsiusTemp);
 }
 
-.weather-icon {
-  height: 64px;
-  width: 64px;
-  margin-right: 10px;
-}
+let celsiusTemp = null;
+let form = document.querySelector("#search-form");
+form.addEventListener("submit", handleSubmit);
 
-.temperature {
-  color: rgb(33, 33, 33);
-  font-size: 64px;
-  font-weight: 400;
-  line-height: 1;
-}
+let convertToFahrenheit = document.querySelector("#fahrenheit-temp");
+convertToFahrenheit.addEventListener("click", showFahrenheitTemp);
 
-.units {
-  position: relative;
-  top: -34px;
-}
+let convertToCelsius = document.querySelector("#celsius-temp");
+convertToCelsius.addEventListener("click", showCelsiusTemp);
 
-.search-form {
-  margin-bottom: 20px;
-}
+search("Johannesburg");
+
